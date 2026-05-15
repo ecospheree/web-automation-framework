@@ -1,0 +1,47 @@
+name: Web Automation CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  web-automation-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Grant Execute Permission
+        run: chmod +x gradlew
+
+      - name: Build Project
+        run: ./gradlew build
+
+      - name: Run Automation Test
+        run: ./gradlew test
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+
+        if: always()
+
+        with:
+          name: web-automation-report
+          path: reports/
